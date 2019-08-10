@@ -19,7 +19,8 @@ struct Project {
     var finalMark: Int
     var cursusIds: Int
     var subprojects = [Project]()
-    init(name: String, slug: String, id: Int, parentId: Int?, status: String, validated: Bool, finalMark: Int, cursusIds: Int, subprojects: [Project]) {
+    var opened: Bool
+    init(name: String, slug: String, id: Int, parentId: Int?, status: String, validated: Bool, finalMark: Int, cursusIds: Int, subprojects: [Project], opened: Bool) {
         self.name = name
         self.slug = slug
         self.id = id
@@ -29,19 +30,23 @@ struct Project {
         self.finalMark = finalMark
         self.cursusIds = cursusIds
         self.subprojects = subprojects
+        self.opened = opened
     }
 }
 
 class Student: NSObject {
     private var imageUrl: String?
+    private var coalitionName: String?
+    private var id = Int()
     private var login = String()
-    private var phone = String()
+    private var email = String()
     private var wallet = Int()
     private var correctionPoints = Int()
     private var location = String()
     private var level = Double()
     private var skills = [Skill]()
-    private var projects = [Project]()
+    var projects = [Project]()
+    
     
     func setImageUrl(imageUrl: String?) {
         self.imageUrl = imageUrl
@@ -49,6 +54,22 @@ class Student: NSObject {
     
     func getImageUrl() -> String? {
         return self.imageUrl
+    }
+    
+    func setCoalitionName(coalitionName: String) {
+        self.coalitionName = coalitionName
+    }
+    
+    func getCoalitionName() -> String? {
+        return self.coalitionName
+    }
+    
+    func setId(id: Int) {
+        self.id = id
+    }
+    
+    func getId() -> Int {
+        return self.id
     }
     
     func setLogin(login: String) {
@@ -59,12 +80,12 @@ class Student: NSObject {
         return self.login
     }
     
-    func setPhone(phone: String) {
-        self.phone = phone
+    func setEmail(phone: String) {
+        self.email = phone
     }
     
-    func getPhone() -> String {
-        return self.phone
+    func getEmail() -> String {
+        return self.email
     }
     
     func setWallet(wallet: Int) {

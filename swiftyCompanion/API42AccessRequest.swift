@@ -80,4 +80,25 @@ class API42AccessRequest: NSObject {
             }
         }
     }
+    
+    func getCoalition(studentId: Int, completeonClosure: @escaping (AnyObject?) -> ()) {
+        let userUrl = URL(string: "https://api.intra.42.fr/v2/blocs/\(studentId)")
+        let bearer = "Bearer " + self.token
+        var request = URLRequest(url: userUrl!)
+        request.httpMethod = "GET"
+        request.setValue(bearer, forHTTPHeaderField: "Authorization")
+        
+        Alamofire.request(request as URLRequestConvertible).validate().responseJSON {
+            response in
+            switch response.result {
+            case .success:
+                if let value = response.result.value {
+                    completeonClosure(value as AnyObject?)
+                }
+            case .failure:
+                print("no coalition")
+                completeonClosure(nil as AnyObject?)
+            }
+        }
+    }
 }

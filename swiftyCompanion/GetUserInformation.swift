@@ -9,8 +9,9 @@ class GetUserInformation: NSObject {
         let student = Student()
         
         student.setImageUrl(imageUrl: getImageUrl(userJson: userJson))
+        student.setId(id: getId(userJson: userJson))
         student.setLogin(login: getLogin(userJson: userJson))
-        student.setPhone(phone: getPhone(userJson: userJson))
+        student.setEmail(phone: getEmail(userJson: userJson))
         student.setWallet(wallet: getWallet(userJson: userJson))
         student.setCorrectionPoints(correctionPoints: getCorrectionPoints(userJson: userJson))
         student.setLocation(location: getLocation(userJson: userJson))
@@ -34,8 +35,15 @@ class GetUserInformation: NSObject {
         return ""
     }
     
-    private static func getPhone(userJson: NSDictionary) -> String {
-        if let phone = userJson["phone"] as? String {
+    private static func getId(userJson: NSDictionary) -> Int {
+        if let id = userJson["id"] as? Int {
+            return id
+        }
+        return 0
+    }
+    
+    private static func getEmail(userJson: NSDictionary) -> String {
+        if let phone = userJson["email"] as? String {
             return phone
         }
         return ""
@@ -125,10 +133,8 @@ class GetUserInformation: NSObject {
     }
     
     private static func getProjectValidated(projectDictionary: [String : Any]) -> Bool {
-        if let projectValidated = projectDictionary["validated?"] as? String {
-            if projectValidated == "YES" {
-                return true
-            }
+        if let projectValidated = projectDictionary["validated?"] as? Bool {
+            return projectValidated
         }
         return false
     }
@@ -173,7 +179,7 @@ class GetUserInformation: NSObject {
             }
         }
         
-        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status!, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects)
+        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status!, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, opened: false)
     }
     
     private static func searchParrentIndex(parrentId: Int, projects: [Project]) -> Int? {
@@ -196,7 +202,7 @@ class GetUserInformation: NSObject {
         let cursusIds = 4
         let subprojects = [Project]()
         
-        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects)
+        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, opened: false)
     }
     
     private static func checkRestProjects(projects: inout [Project], restProjects: inout [Project]) {

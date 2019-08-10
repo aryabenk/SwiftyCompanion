@@ -13,6 +13,8 @@ class ViewController: UIViewController {
                 returnJSON in
                 if let json = returnJSON as? NSDictionary {
                     self.student = GetUserInformation.getStudent(userJson: json)
+                    //self.student.setCoalitionName(coalitionName: self.api42.getCoalition(studentId: self.student.getId()))
+                    
                     let displayVC : StudentProfileViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StudentProfileView") as! StudentProfileViewController
                     displayVC.student = self.student
                     self.navigationController?.pushViewController(displayVC, animated: true)

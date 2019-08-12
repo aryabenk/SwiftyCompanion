@@ -82,7 +82,7 @@ class API42AccessRequest: NSObject {
     }
     
     func getCoalition(studentId: Int, completeonClosure: @escaping (AnyObject?) -> ()) {
-        let userUrl = URL(string: "https://api.intra.42.fr/v2/blocs/\(studentId)")
+        let userUrl = URL(string: "https://api.intra.42.fr/v2/users/\(studentId)/coalitions")
         let bearer = "Bearer " + self.token
         var request = URLRequest(url: userUrl!)
         request.httpMethod = "GET"
@@ -96,6 +96,7 @@ class API42AccessRequest: NSObject {
                     completeonClosure(value as AnyObject?)
                 }
             case .failure:
+                print(response.data!)
                 print("no coalition")
                 completeonClosure(nil as AnyObject?)
             }

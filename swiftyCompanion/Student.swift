@@ -19,8 +19,9 @@ struct Project {
     var finalMark: Int
     var cursusIds: Int
     var subprojects = [Project]()
+    var data = String()
     var opened: Bool
-    init(name: String, slug: String, id: Int, parentId: Int?, status: String, validated: Bool, finalMark: Int, cursusIds: Int, subprojects: [Project], opened: Bool) {
+    init(name: String, slug: String, id: Int, parentId: Int?, status: String, validated: Bool, finalMark: Int, cursusIds: Int, subprojects: [Project], data: String, opened: Bool) {
         self.name = name
         self.slug = slug
         self.id = id
@@ -30,13 +31,15 @@ struct Project {
         self.finalMark = finalMark
         self.cursusIds = cursusIds
         self.subprojects = subprojects
+        self.data = data
         self.opened = opened
     }
 }
 
 class Student: NSObject {
-    private var imageUrl: String?
-    private var coalitionName: String?
+    private var imageUrl = String()
+    private var coalitionName = String()
+    private var coalitionUrl = String()
     private var id = Int()
     private var login = String()
     private var email = String()
@@ -48,11 +51,11 @@ class Student: NSObject {
     var projects = [Project]()
     
     
-    func setImageUrl(imageUrl: String?) {
+    func setImageUrl(imageUrl: String) {
         self.imageUrl = imageUrl
     }
     
-    func getImageUrl() -> String? {
+    func getImageUrl() -> String {
         return self.imageUrl
     }
     
@@ -60,8 +63,16 @@ class Student: NSObject {
         self.coalitionName = coalitionName
     }
     
-    func getCoalitionName() -> String? {
+    func getCoalitionName() -> String {
         return self.coalitionName
+    }
+    
+    func setCoalitionUrl(coalitionUrl: String) {
+        self.coalitionUrl = coalitionUrl
+    }
+    
+    func getCoalitionUrl() -> String? {
+        return self.coalitionUrl
     }
     
     func setId(id: Int) {

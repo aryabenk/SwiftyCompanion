@@ -21,11 +21,35 @@ class GetUserInformation: NSObject {
         return student
     }
     
-    private static func getImageUrl(userJson: NSDictionary) -> String? {
-        if let imageUrl = userJson["image_url"] as? String {
-                return imageUrl
+    static func getCoalitionName(coalitionData: [[String:Any]]) -> String {
+        var coalitionName = String()
+        
+        for elem in coalitionData {
+            if let name = elem["name"] as? String {
+                coalitionName = name
+            }
         }
-        return nil
+        return coalitionName
+    }
+    
+    static func getCoalitionUrl(coalitionData: [[String:Any]]) -> String {
+        var coalitionUrl = String()
+        
+        for elem in coalitionData {
+            if let coverUrl = elem["cover_url"] as? String {
+                coalitionUrl = coverUrl
+            }
+        }
+        return coalitionUrl
+    }
+    
+    private static func getImageUrl(userJson: NSDictionary) -> String {
+        var imageUrl = String()
+        
+        if let imgUrl = userJson["image_url"] as? String {
+                imageUrl = imgUrl
+        }
+        return imageUrl
     }
     
     private static func getLogin(userJson: NSDictionary) -> String {
@@ -112,38 +136,57 @@ class GetUserInformation: NSObject {
     }
     
     private static func getProjectId(projectDictionary: [String:Any]) -> Int? {
-        if let projectId = projectDictionary["id"] as? Int {
-            return projectId
+        var projectId: Int? = nil
+        
+        if let id = projectDictionary["id"] as? Int {
+            projectId = id
         }
-        return nil
+        return projectId
     }
     
     private static func getProjectParentId(projectDictionary: [String:Any]) -> Int? {
-        if let projectParentId = projectDictionary["parent_id"] as? Int {
-            return projectParentId
+        var projectParentId: Int? = nil
+        
+        if let parentId = projectDictionary["parent_id"] as? Int {
+            projectParentId = parentId
         }
-        return nil
+        return projectParentId
     }
     
     private static func getProjectStatus(projectDictionary: [String : Any]) -> String? {
-        if let projectStatus = projectDictionary["status"] as? String {
-            return projectStatus
+        var projectStatus: String? = nil
+        
+        if let status = projectDictionary["status"] as? String {
+            projectStatus = status
         }
-        return nil
+        return projectStatus
     }
     
     private static func getProjectValidated(projectDictionary: [String : Any]) -> Bool {
-        if let projectValidated = projectDictionary["validated?"] as? Bool {
-            return projectValidated
+        var isProjectValidated = false
+        
+        if let validated = projectDictionary["validated?"] as? Bool {
+            isProjectValidated = validated
         }
-        return false
+        return isProjectValidated
     }
     
     private static func getProjectFinalMark(projectDictionary: [String : Any]) -> Int {
-        if let projectFinalMark = projectDictionary["final_mark"] as? Int {
-            return projectFinalMark
+        var projectFinalMark = Int()
+        
+        if let finalMark = projectDictionary["final_mark"] as? Int {
+            projectFinalMark = finalMark
         }
-        return 0
+        return projectFinalMark
+    }
+    
+    private static func getProjectData(projectDictionary: [String : Any]) -> String {
+        var projectData = String()
+        
+        if let markedAt = projectDictionary["marked_at"] as? String {
+            projectData = markedAt
+        }
+        return projectData
     }
     
     private static func initializeProject(projectDictionary: [String : Any]) -> Project {
@@ -154,6 +197,7 @@ class GetUserInformation: NSObject {
         let status = getProjectStatus(projectDictionary: projectDictionary)
         let validated = getProjectValidated(projectDictionary: projectDictionary)
         let finalMark = getProjectFinalMark(projectDictionary: projectDictionary)
+        let data = getProjectData(projectDictionary: projectDictionary)
         let subprojects = [Project]()
         var cursusIds = Int()
         
@@ -174,12 +218,12 @@ class GetUserInformation: NSObject {
         
         if let value = projectDictionary["cursus_ids"] as? [Int] {
             cursusIds = value[0]
-            if (cursusIds == 4) {
+            if (cursusIds == 4 && parentId != 167) {
                 parentId = 1
             }
         }
         
-        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status!, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, opened: false)
+        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status!, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, data: data, opened: false)
     }
     
     private static func searchParrentIndex(parrentId: Int, projects: [Project]) -> Int? {
@@ -191,9 +235,22 @@ class GetUserInformation: NSObject {
         return nil
     }
     
-    private static func createCPoolProject() -> Project {
+    private static func getCPiscineFinalLevel(userJson: NSDictionary) -> Double {
+        var piscineCFinalLevel = Double()
+        
+        if let cursus = userJson["cursus_users"] as? [[String:Any]] {
+            if (cursus.count > 1) {
+                if let level = cursus[1]["level"] as? Double {
+                    piscineCFinalLevel = level
+                }
+            }
+        }
+        return piscineCFinalLevel
+    }
+    
+    private static func createCPoolProject(userJson: NSDictionary) -> Project {
         let name = "Piscine C"
-        let slug = "Piscine C"
+        let slug = String(getCPiscineFinalLevel(userJson: userJson))
         let id = 1
         let parentId: Int? = nil
         let status = "finished"
@@ -201,8 +258,9 @@ class GetUserInformation: NSObject {
         let finalMark = 0
         let cursusIds = 4
         let subprojects = [Project]()
+        let data = "0"
         
-        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, opened: false)
+        return Project(name: name, slug: slug, id: id, parentId: parentId, status: status, validated: validated, finalMark: finalMark, cursusIds: cursusIds, subprojects: subprojects, data: data, opened: false)
     }
     
     private static func checkRestProjects(projects: inout [Project], restProjects: inout [Project]) {
@@ -219,7 +277,7 @@ class GetUserInformation: NSObject {
     private static func sortSubprojects(projects: inout [Project]) {
         for (index, project) in projects.enumerated() {
             if !project.subprojects.isEmpty {
-                projects[index].subprojects = project.subprojects.sorted(by: { $0.id < $1.id })
+                projects[index].subprojects = project.subprojects.sorted(by: { $0.data < $1.data })
             }
         }
     }
@@ -228,19 +286,21 @@ class GetUserInformation: NSObject {
         var projects = [Project]()
         var restProjects = [Project]()
         if let userProjects = userJson["projects_users"] as? [[String:Any]] {
-            projects.append(createCPoolProject())
+            projects.append(createCPoolProject(userJson: userJson))
             for elem in userProjects {
                 let newProject = initializeProject(projectDictionary: elem)
-                if let parentId = newProject.parentId {
-                    if let parentIndex = searchParrentIndex(parrentId: parentId, projects: projects) {
-                        projects[parentIndex].subprojects.append(newProject)
+                if (newProject.parentId != 167) {
+                    if let parentId = newProject.parentId {
+                        if let parentIndex = searchParrentIndex(parrentId: parentId, projects: projects) {
+                            projects[parentIndex].subprojects.append(newProject)
+                        }
+                        else {
+                            restProjects.append(newProject)
+                        }
                     }
                     else {
-                        restProjects.append(newProject)
+                        projects.append(newProject)
                     }
-                }
-                else {
-                    projects.append(newProject)
                 }
             }
         }
